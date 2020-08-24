@@ -1,0 +1,11 @@
+* {
+    font-family: 'Gilroy','Spoqa Han Sans','Apple SD Gothic Neo', 'Malgun Gothic','Nanum Gothic', 'Noto Sans','sans-serif';
+}
+
+.bg-black {
+    background: black;
+}
+
+.bg-gray {
+    background: #222222;
+}

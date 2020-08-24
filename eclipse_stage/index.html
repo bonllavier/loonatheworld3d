@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <title>KIm LIp - Eclipse 3D</title>
+
+        <!-- Babylon.js -->
+        <script src="https://code.jquery.com/pep/0.4.2/pep.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
+        <script src="https://preview.babylonjs.com/ammo.js"></script>
+        <script src="https://preview.babylonjs.com/cannon.js"></script>
+        <script src="https://preview.babylonjs.com/Oimo.js"></script>
+        <script src="https://preview.babylonjs.com/libktx.js"></script>
+        <script src="https://preview.babylonjs.com/earcut.min.js"></script>
+        <script src="https://preview.babylonjs.com/babylon.js"></script>
+        <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+        <script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+        <script src="https://preview.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
+        <script src="https://preview.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
+        <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+        <script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+        <script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
+        <link rel='shortcut icon' type='image/x-icon' href='../icons/main_icon1.ico' />
+
+        <meta property="og:title" content="LOONA 3D Kim Lip - Eclipse"/>
+        <meta property="og:site_name" content="LOONA 3D FAN PROJECT"/>
+        
+        <meta name="description" content="LOONA 3D STAGES FAN PROJECT">
+        <meta property="og:description" content="LOONA 3D STAGES FAN PROJECT"/>
+    
+        <meta name="keywords" content="LOONA, KPOP, 3D, BABYLON, BLOCKBERRY, CREATIVE, pop, kaleidoscope, fun, itzy, twice, stan, loona, stanloona, music, visualizer, javascript, html">
+        
+        <meta name="author" content="Javier Bonilla Mite - javb92">
+        
+        <meta property="og:image" content="./img/preview1.jpg" />
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image:width" content="500" />
+        <meta property="og:image:height" content="319" />
+    
+        <meta property="og:url" content="loonatheworld3d.com">
+    
+        <meta property="og:type" content="web application"/>
+
+        <style>
+            html, body {
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            #renderCanvas {
+                width: 100%;
+                height: 100%;
+                touch-action: none;
+            }
+            audio {
+                position: fixed;
+                left: 10px;
+                bottom: 10px;
+                width: calc(100% - 25px);
+                z-index: 3;
+            }
+        </style>
+    </head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+    <audio id="audio" onended="Reset_rotation_value()" controls autoplay>
+        <source src="./bgm/track.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <script>
+        var canvas = document.getElementById("renderCanvas");
+
+        var engine = null;
+        var scene = null;
+        var sceneToRender = null;
+        var createDefaultEngine = function() { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true }); };
+        var delayCreateScene = function () {
+
+
+            // This is really important to tell Babylon.js to use decomposeLerp and matrix interpolation
+            BABYLON.Animation.AllowMatricesInterpolation = true;
+
+            // Create a scene.
+            var scene = new BABYLON.Scene(engine);
+
+            //Adding an Arc Rotate Camera
+            //var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0.8, 100, BABYLON.Vector3.Zero(), scene);
+            //camera.attachControl(canvas, false);
+
+            // Parameters : name, position, scene
+            var camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(0, 1, 10), scene);
+            camera.speed = 0.1;
+            camera.fov = 0.9;
+
+            // Targets the camera to a particular position. In this case the scene origin
+            camera.setTarget(BABYLON.Vector3.Zero());
+
+            // Attach the camera to the canvas
+            camera.attachControl(canvas, true);
+
+        
+            // Create a default skybox with an environment.
+            //var hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("textures/environment.dds", scene);
+            //var currentSkybox = scene.createDefaultSkybox(hdrTexture, true);
+        
+            // Append glTF model to scene.
+            BABYLON.SceneLoader.ShowLoadingScreen = false;
+            BABYLON.SceneLoader.Append("./scenes/", "scenekimlipver4_nocam.babylon", scene, function (scene) {
+                // Create a default arc rotate camera and light.
+                //scene.createDefaultCameraOrLight(true, true, true);
+        
+                // The default camera looks at the back of the asset.
+                // Rotate the camera by 180 degrees to the front of the asset.
+                //scene.activeCamera.alpha += Math.PI;
+            });
+            
+            //KIM LIP ARMATURE
+
+
+            BABYLON.SceneLoader.ImportMesh("", "./scenes/", "kimliparmature_animation1.glb", scene, function (newMeshes, particleSystems, skeletons, animationGroups) {
+                var skeleton = skeletons[0];
+                var kim_lip = newMeshes[0];
+                kim_lip.position = new BABYLON.Vector3(0, 0.59, 0);
+
+                // shadowGenerator.addShadowCaster(scene.meshes[0], true);
+                // for (var index = 0; index < newMeshes.length; index++) {
+                //     newMeshes[index].receiveShadows = false;;
+                // }
+
+                // var helper = scene.createDefaultEnvironment({
+                //     enableGroundShadow: true
+                // });
+                // helper.setMainColor(BABYLON.Color3.Gray());
+                // helper.ground.position.y += 0.01;
+
+                // ROBOT
+                // skeleton.animationPropertiesOverride = new BABYLON.AnimationPropertiesOverride();
+                // skeleton.animationPropertiesOverride.enableBlending = true;
+                // skeleton.animationPropertiesOverride.blendingSpeed = 0.05;
+                // skeleton.animationPropertiesOverride.loopMode = 0;
+
+                // Enable animation blending for all animations
+                // scene.animationPropertiesOverride = new BABYLON.AnimationPropertiesOverride();
+                // scene.animationPropertiesOverride.enableBlending = true;
+                // scene.animationPropertiesOverride.blendingSpeed = 0.02;
+                // scene.animationPropertiesOverride.loopMode = 1;
+
+                var idleRange = scene.getAnimationGroupByName("kim_idle1");
+                var step1 = scene.getAnimationGroupByName("kim_step1");
+                var step2 = scene.getAnimationGroupByName("kim_step2");
+                var step3 = scene.getAnimationGroupByName("kim_step3");
+                var step4 = scene.getAnimationGroupByName("kim_step4");
+                var step5 = scene.getAnimationGroupByName("kim_step5");
+
+                // IDLE
+                //if (idleRange) scene.beginAnimation(skeleton, idleRange.from, idleRange.to, false);
+
+                // UI
+                var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+                var UiPanel = new BABYLON.GUI.StackPanel();
+                UiPanel.width = "220px";
+                UiPanel.fontSize = "14px";
+                UiPanel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+                UiPanel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+                advancedTexture.addControl(UiPanel);
+                // ..
+                var button = BABYLON.GUI.Button.CreateSimpleButton("but1", "Play Idle");
+                button.paddingTop = "10px";
+                button.width = "100px";
+                button.height = "50px";
+                button.color = "white";
+                button.background = "red";
+                button.onPointerDownObservable.add(() => {
+                    //if (idleRange) scene.beginAnimation(skeleton, idleRange.from, idleRange.to, true);
+                    animationGroups.forEach(group => {
+                        group.stop();
+                        //group.reset();
+                    });
+                    if (idleRange) {idleRange.play(false);}
+                });
+                UiPanel.addControl(button);
+                // ..
+                var button1 = BABYLON.GUI.Button.CreateSimpleButton("but2", "Play Step 1");
+                button1.paddingTop = "10px";
+                button1.width = "100px";
+                button1.height = "50px";
+                button1.color = "white";
+                button1.background = "red";
+                button1.onPointerDownObservable.add(() => {
+                    animationGroups.forEach(group => {
+                        group.stop();
+                    });
+                    if (step1) {step1.play(false);}
+                });
+                UiPanel.addControl(button1);
+                // ..
+                var button1 = BABYLON.GUI.Button.CreateSimpleButton("but3", "Play Step 2");
+                button1.paddingTop = "10px";
+                button1.width = "100px";
+                button1.height = "50px";
+                button1.color = "white";
+                button1.background = "red";
+                button1.onPointerDownObservable.add(() => {
+                    //if (step2) scene.beginAnimation(skeleton, step2.from, step2.to, true);
+                    animationGroups.forEach(group => {
+                        group.stop();
+                        //group.reset();
+                    });
+                    if (step2) {step2.play(false);}
+                });
+                UiPanel.addControl(button1);
+                // ..
+                var button1 = BABYLON.GUI.Button.CreateSimpleButton("but4", "Play Step 3");
+                button1.paddingTop = "10px";
+                button1.width = "100px";
+                button1.height = "50px";
+                button1.color = "white";
+                button1.background = "red";
+                button1.onPointerDownObservable.add(() => {
+                    //if (step3) scene.beginAnimation(skeleton, step3.from, step3.to, true);
+                    animationGroups.forEach(group => {
+                        group.stop();
+                        //group.reset();
+                    });
+                    if (step3) {step3.play(false);}
+                });
+                UiPanel.addControl(button1);
+                // ..
+                var button1 = BABYLON.GUI.Button.CreateSimpleButton("but5", "Play Step 4");
+                button1.paddingTop = "10px";
+                button1.width = "100px";
+                button1.height = "50px";
+                button1.color = "white";
+                button1.background = "red";
+                button1.onPointerDownObservable.add(() => {
+                    //if (step4) scene.beginAnimation(skeleton, step4.from, step4.to, true);
+                    animationGroups.forEach(group => {
+                        group.stop();
+                        //group.reset();
+                    });
+                    if (step4) {step4.play(false);}
+                });
+                UiPanel.addControl(button1);
+
+                var button1 = BABYLON.GUI.Button.CreateSimpleButton("but6", "Play Step 5");
+                button1.paddingTop = "10px";
+                button1.width = "100px";
+                button1.height = "50px";
+                button1.color = "white";
+                button1.background = "red";
+                button1.onPointerDownObservable.add(() => {
+                    //if (step4) scene.beginAnimation(skeleton, step4.from, step4.to, true);
+                    animationGroups.forEach(group => {
+                        group.stop();
+                        //group.reset();
+                    });
+                    if (step5) {step5.play(false);}
+                });
+                UiPanel.addControl(button1);
+
+
+            });
+
+        
+            return scene;
+        };
+            
+    var engine;
+    try {
+    engine = createDefaultEngine();
+    } catch(e) {
+    console.log("the available createEngine function failed. Creating the default engine instead");
+    engine = createDefaultEngine();
+    }
+        if (!engine) throw 'engine should not be null.';
+        scene = delayCreateScene();;
+        sceneToRender = scene
+
+        engine.runRenderLoop(function () {
+            if (sceneToRender) {
+                sceneToRender.render();
+            }
+        });
+        //scene.debugLayer.show();
+        // Resize
+        window.addEventListener("resize", function () {
+            engine.resize();
+        });
+    </script>
+</body>
+</html>
